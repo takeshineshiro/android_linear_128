@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/bg_buttom"
+    android:weightSum="14"
+    >
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:layout_margin="2dp"
+        android:text="0/0"
+
+        />
+
+    <SeekBar
+        android:id="@+id/scan_seekbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="2dp"
+        android:layout_weight="7"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/bg_scan_bar"
+        android:thumb="@drawable/thumb_scan_bar"
+        android:thumbOffset="0dip"
+        android:maxHeight="6dp"
+        android:minHeight="6dp"
+        />
+
+
+
+    <ImageButton
+        android:id= "@+id/btn_pre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_pre"
+        />
+
+
+    <ImageButton
+        android:id= "@+id/btn_play"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_play"
+        />
+
+
+    <ImageButton
+        android:id= "@+id/btn_next"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_next"
+        />
+
+    <ImageButton
+        android:id= "@+id/btn_save"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_save"
+        />
+
+
+    <ImageButton
+        android:id= "@+id/btn_scan"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:layout_margin="2dp"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_scan"
+        />
+
+    <ImageButton
+        android:id= "@+id/btn_settting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:layout_margin="2dp"
+        android:scaleType="fitCenter"
+        android:background="@drawable/btn_setting"
+        />
+
+
+
+</LinearLayout>
