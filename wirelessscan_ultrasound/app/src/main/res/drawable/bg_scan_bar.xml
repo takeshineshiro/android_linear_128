@@ -5,5 +5,5 @@
     <!-- 第二进度图 -->
     <item android:id="@android:id/secondaryProgress" android:drawable="@drawable/bottomslide_processorbar" />
     <!-- 进度度 -->
-    <item android:id="@android:id/progress" android:drawable="@drawable/bottomslide_slot" />
+    <item android:id="@android:id/progress" android:drawable="@drawable/bottomslide_processorbar" />
 </layer-list>

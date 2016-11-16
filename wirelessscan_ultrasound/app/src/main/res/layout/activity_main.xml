@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:orientation  ="vertical"
     android:weightSum    = "17"
-    tools:context        ="com.medical.lepu.wirelessscan_ultrasound.MainActivity">
+    tools:context        ="com.medical.lepu.wirelessscan_ultrasound.activity.MainActivity">
 
     <!--actionbar-->
 
@@ -19,13 +19,13 @@
         layout="@layout/title_bar_lay" />
 
 
-    <FrameLayout
+    <include
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="14"
+        layout="@layout/view_main_lay"
 
-        >
-    </FrameLayout>
+       />
 
 
     <include
