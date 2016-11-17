@@ -11,8 +11,8 @@ import android.widget.SeekBar;
  * Created by wong on 11/16/16.
  */
 
-public class VerticalSeekBar  extends SeekBar {
-
+public class VerticalSeekBar extends SeekBar {
+    private static final String TAG = "VerticalSeekBar";
 
     public VerticalSeekBar(Context context) {
         super(context);
@@ -26,58 +26,57 @@ public class VerticalSeekBar  extends SeekBar {
         super(context, attrs, defStyle);
     }
 
-    protected void onSizeChanged(int w, int h, int oldwidth, int oldheight) {
-        super.onSizeChanged(h, w, oldheight, oldwidth);
+    /**
+     *  the arguments in super method need to change the position. Understand?
+     */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        Log.d(TAG, "onSizeChanged");
+        super.onSizeChanged(h, w, oldh, oldw);
     }
 
+    /**
+     *  the arguments in super method need to change the position. Understand?
+     */
     @Override
-    protected synchronized void onMeasure(int widthMeasureSpec,
-                                          int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.d(TAG, "onMeasure");
+        super.onMeasure(heightMeasureSpec, widthMeasureSpec);
         setMeasuredDimension(getMeasuredHeight(), getMeasuredWidth());
     }
 
-
+    /**
+     *  keep the position of the upper left corner unchanged(保证左上角坐标不变!)
+     */
+    @Override
     protected void onDraw(Canvas c) {
+        Log.d(TAG, "onDraw");
         c.rotate(-90);
-        c.translate(-getHeight(),0);
+        c.translate(-getHeight(), 0);
+
         super.onDraw(c);
     }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "onTouchEvent");
         if (!isEnabled()) {
             return false;
         }
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-
-
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
-                int i=0;
-                i=getMax() - (int)(getMax() * event.getY() / getHeight());
+                int i = getMax() - (int) (getMax() * event.getY() / getHeight());
                 setProgress(i);
-                Log.i("Progress",getProgress()+"");
-                onSizeChanged(getWidth(),getHeight(), 0, 0);
-                break;
-            case MotionEvent.ACTION_CANCEL:
+                onSizeChanged(getWidth(), getHeight(), 0, 0);
                 break;
         }
         return true;
     }
 
-
-
-
-
-
-
 }
-
-
 
 
 

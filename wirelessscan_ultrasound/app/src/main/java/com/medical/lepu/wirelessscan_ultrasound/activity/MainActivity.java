@@ -102,9 +102,9 @@ public class MainActivity extends Activity  implements  OnClickListener{
 
     private   void   initVarible()   {
 
-         running     =  false  ;
+       running     =  false  ;
 
-        wifiManager  =  (WifiManager) getSystemService(Context.WIFI_SERVICE) ;
+       wifiManager  =  (WifiManager) getSystemService(Context.WIFI_SERVICE) ;
 
     }
 
@@ -123,12 +123,12 @@ public class MainActivity extends Activity  implements  OnClickListener{
     @Override
     protected void onResume() {
 
-        openWifi();
+   //     openWifi();
 
-        currentWifiInfo = wifiManager.getConnectionInfo();
+  //      currentWifiInfo = wifiManager.getConnectionInfo();
 
-        ssidWifi.setText("当前网络：" + currentWifiInfo.getSSID()+ " ip:"
-                + WifiUtil.intToIp(currentWifiInfo.getIpAddress()));
+ //       ssidWifi.setText("当前网络：" + currentWifiInfo.getSSID()+ " ip:"
+  //              + WifiUtil.intToIp(currentWifiInfo.getIpAddress()));
 
 
 

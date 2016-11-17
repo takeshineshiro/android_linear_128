@@ -3,25 +3,16 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity      ="center"
     android:background="@drawable/bg_top"
     >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        />
-
 
     <ImageButton
         android:id="@+id/btn_wifi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_margin="4dp"
         android:padding="10dp"
-        android:background="@drawable/icon_wireless"
+        android:background="@mipmap/icon_wireless"
         android:scaleType="fitCenter"
         />
 

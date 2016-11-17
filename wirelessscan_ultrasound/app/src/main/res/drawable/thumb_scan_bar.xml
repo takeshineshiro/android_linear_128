@@ -3,14 +3,14 @@
 
     <!-- 按下状态 -->
     <item android:state_pressed="true"
-        android:drawable="@drawable/buttomslide_slide" />
+        android:drawable="@mipmap/buttomslide_slide" />
 
     <!-- 焦点状态 -->
     <item android:state_focused="true"
-        android:drawable="@drawable/buttomslide_slide" />
+        android:drawable="@mipmap/buttomslide_slide" />
 
     <!-- 默认状态 -->
-    <item android:drawable="@drawable/buttomslide_slide" />
+    <item android:drawable="@mipmap/buttomslide_slide" />
 
 
 </selector>

@@ -40,12 +40,11 @@
         android:layout_margin="2dp"
         android:layout_gravity="center_vertical"
         android:max="100"
-        android:progress="40"
-        android:progressDrawable="@drawable/bg_gain_bar"
-        android:thumb="@drawable/thumb_gain_bar"
+        android:progress="10"
         android:thumbOffset="0dip"
-        android:maxHeight="12dp"
-        android:minHeight="12dp"
+        android:maxHeight="6dp"
+        android:minHeight="6dp"
+
 
         />
 
