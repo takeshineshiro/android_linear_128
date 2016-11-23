@@ -1,6 +1,5 @@
 package com.medical.lepu.wirelessscan_ultrasound.activity;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +7,8 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Message;
 import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -19,12 +18,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.medical.lepu.wirelessscan_ultrasound.R;
+import com.medical.lepu.wirelessscan_ultrasound.base.BaseActivity;
 import com.medical.lepu.wirelessscan_ultrasound.widget.VerticalSeekBar;
 
 import java.util.List;
 
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
      private  ImageButton  btnWifi;
