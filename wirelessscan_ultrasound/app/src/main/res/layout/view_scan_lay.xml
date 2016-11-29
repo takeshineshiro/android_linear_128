@@ -13,12 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:background="@drawable/gradient"
-        />
-
-     <ImageView
-         android:id = "@+id/scan_view"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent" />
+        android:id="@+id/imageView" />
 
     <ImageView
         android:layout_width="4dp"
@@ -28,6 +23,66 @@
         android:background="@drawable/scale_scan"
         />
 
+    <RelativeLayout
+        android:id = "@+id/imageView_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+
+
+        <ImageView
+            android:id = "@+id/ultrasound_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+             />
+
+        <TextView
+            android:text="time_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:textSize="12sp"
+            android:id="@+id/time_zone" />
+
+        <TextView
+            android:text="gain_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="14dp"
+            android:textSize="12sp"
+            android:id="@+id/gain_zone" />
+
+        <TextView
+            android:text="depth_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+             android:textSize="12sp"
+            android:id="@+id/depth_zone" />
+
+        <TextView
+            android:text="freezing_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:id="@+id/freezing_zone" />
+    </RelativeLayout>
 
 
 </RelativeLayout>

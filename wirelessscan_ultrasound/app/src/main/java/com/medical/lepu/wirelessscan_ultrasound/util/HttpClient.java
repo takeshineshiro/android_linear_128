@@ -1,30 +1,124 @@
 package com.medical.lepu.wirelessscan_ultrasound.util;
 
+import android.util.Log;
+
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.AsyncSocket;
+import com.koushikdutta.async.ByteBufferList;
+import com.koushikdutta.async.DataEmitter;
+import com.koushikdutta.async.Util;
+import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.ConnectCallback;
+import com.koushikdutta.async.callback.DataCallback;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 
 /**
  * Created by wong on 11/23/16.
  */
 
-public class HttpClient    {
+public class HttpClient      implements   ConnectCallback {
 
 
-    public   static   void   setup   (  String  host  ,  int  port )    {
+    private   String    host   ;
 
-        AsyncServer.getDefault().connectSocket(new InetSocketAddress(host, port), new ConnectCallback() {
-            @Override
-            public void onConnectCompleted(Exception ex, AsyncSocket socket) {
+    private    int      port    ;
+
+    private AsyncSocket   socket  ;
+
+    private  boolean     connect_state  = false;
+
+    private   byte[]   data ;
 
 
-            }
-        })  ;
 
+    public   HttpClient  ( String  host   , int  port )   {
+
+        this.host   =  host   ;
+        this.port   =  port   ;
+
+        setup   ()  ;
 
     }
+
+    public    void   setup   ()   {
+
+
+        AsyncServer.getDefault().connectSocket(new InetSocketAddress(host, port), this);
+
+    }
+
+
+    @Override
+    public void onConnectCompleted(Exception ex, AsyncSocket socket) {
+
+        if (ex!=null)     throw new  RuntimeException(ex)  ;
+
+        this.connect_state  =   true   ;
+
+        this.socket        =  socket   ;
+
+    }
+
+
+
+    public     boolean  isConnect  ()  {
+
+          return    connect_state  ;
+    }
+
+
+   public   void   writeData   (HashMap <String,String> param)   {
+
+
+       Util.writeAll(socket, "write".getBytes(), new CompletedCallback() {
+           @Override
+           public void onCompleted(Exception ex) {
+               Log.d("writedata","cmd  is  sended !")  ;
+           }
+       });
+
+
+   }
+
+    public    byte[]   readData  () {
+
+        socket.setDataCallback(new DataCallback() {
+            @Override
+            public void onDataAvailable(DataEmitter emitter, ByteBufferList bb) {
+
+                  data =   bb.getAllByteArray();
+            }
+        });
+
+        return   data ;
+
+    }
+
+
+    public   void     closeSocket ()   {
+
+      socket.setClosedCallback(new CompletedCallback() {
+          @Override
+          public void onCompleted(Exception ex) {
+
+
+          }
+      });
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

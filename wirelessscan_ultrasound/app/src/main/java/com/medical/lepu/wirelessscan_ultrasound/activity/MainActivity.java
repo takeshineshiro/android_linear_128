@@ -11,62 +11,117 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.MutableByte;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.medical.lepu.wirelessscan_ultrasound.R;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseActivity;
+import com.medical.lepu.wirelessscan_ultrasound.base.BaseMessage;
 import com.medical.lepu.wirelessscan_ultrasound.widget.VerticalSeekBar;
 
+import java.util.ArrayList;
 import java.util.List;
+
+
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
-     private  ImageButton  btnWifi;
+     private  ImageButton       btnWifi;
 
-     private   TextView   ssid_wifi ;
+     private   TextView         ssid_wifi ;
 
-     private    TextView   view_num ;
+     private    TextView        view_num ;
 
-     private    SeekBar    scan_seekbar ;
+     private    TextView       time_zone  ;
 
-     private   ImageButton  btn_pre  ;
+     private    TextView       gain_zone  ;
 
-     private    ImageButton  btn_play ;
+     private     TextView      depth_zone  ;
 
-    private    ImageButton  btn_next  ;
+     private     TextView      freezing_zone ;
 
-    private    ImageButton  btn_save  ;
+     private     ImageView     ultrasound_view;
 
-    private    ImageButton   btn_scan  ;
+     private    SeekBar        scan_seekbar ;
 
-    private    ImageButton  btn_settting ;
+     private   ImageButton      btn_pre  ;
 
-    private     ImageView    scan_view  ;
+     private    ImageButton     btn_play ;
 
-    private    ImageButton   btn_freeze  ;
+    private    ImageButton     btn_next  ;
+
+    private    ImageButton     btn_save  ;
+
+    private    ImageButton     btn_scan  ;
+
+    private    ImageButton     btn_settting ;
+
+    private   RelativeLayout   imageView_layout ;
+
+    private    ImageButton     btn_freeze  ;
 
    private   VerticalSeekBar  btn_gain_ctl ;
 
 
+  // below   variable
+
+    private   boolean    ssid_valid  ;           // ssid有效
+    private   boolean    pitch_connected ;       // 探头连接
+    private   boolean    running;                // 运行状态
+
+    private   int       snd_running ;    // 需要发送的运行状态 (-1: 无需要发送状态， 0：冻结状态， 1:运行状态）
+
+    private    int      snd_num     ;    //  发送状态的等待计数
+
+    private   boolean    have_image ;    //  图像区是否有图像
+
+    private   boolean    loaded_image;   //  载入的图像
+
+    private   boolean     circle_loop;   //  是否处于回放状态中
+
+    private   boolean     full_screen ;  //  是否处于全屏状态
 
 
+    private   double      gama_value ;   //  图像的gama校正
 
+    private     int       probe_type ;  //  探头类型信息
 
-    private boolean running;
+    private     int       gain_value ;  // 探头当前的增益
 
-    private WifiManager wifiManager;
+    private    int       zoom_value ;  //  探头当前的缩放
 
-    private WifiInfo currentWifiInfo;  // 当前所连接的wifi
+    private    int       sale_code  ;  // 销售区域代码
 
-    private List<ScanResult> wifiList;// wifi列表
+    private ArrayList    image_array ; // 回放图像数据数组
 
-    private ContentResolver  mContentResolver ;
+    private   ImageView     gradientView ;  //  灰度条图像
+
+    private  BaseMessage      message  ;    //  解帧
+
+    private MutableByte[]     imageData ;
+
+    private    int           imagIndex ;
+
+    private    TextView      labelTime ;
+
+    private    TextView      labelDepth;
+
+    private    TextView      labelGain ;
+
+    private WifiManager      wifiManager;
+
+    private WifiInfo         currentWifiInfo;  // 当前所连接的wifi
+
+    private List<ScanResult>   wifiList;// wifi列表
+
+    private ContentResolver    mContentResolver ;
 
 
 
@@ -81,7 +136,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         initListener();
 
-        initVarible();
+        initVariable();
 
 
         loadData();
@@ -113,13 +168,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         btn_settting =   (ImageButton)  findViewById(R.id.btn_settting) ;
 
-        scan_view   =    (ImageView)   findViewById(R.id.scan_view) ;
+        imageView_layout  =   (RelativeLayout) findViewById(R.id.imageView_layout);
 
         btn_freeze   =   (ImageButton) findViewById(R.id.btn_freeze) ;
 
         btn_gain_ctl  =  (VerticalSeekBar)findViewById(R.id.btn_gain_ctl) ;
 
+        time_zone     =   (TextView)  findViewById(R.id.time_zone) ;
 
+        gain_zone     =   (TextView)  findViewById(R.id.gain_zone) ;
+
+        depth_zone    =   (TextView) findViewById(R.id.depth_zone) ;
+
+        freezing_zone =   (TextView)   findViewById(R.id.freezing_zone) ;
+
+        ultrasound_view =  (ImageView)  findViewById(R.id.ultrasound_image) ;
+
+
+        // add  the  scan  view  content,though  the   ViewGroup  add  the subview
+        
     }
 
 
@@ -145,9 +212,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    public void initVarible() {
+    public void initVariable() {
 
-        running = false;
+        Log.i("creat", "main_resume");
+
+        ssid_valid     = false  ;
+
+        running        = false  ;
+
+        pitch_connected = false ;
+
+        snd_running    =  -1   ;
+
+        snd_num      =    0   ;
+
+        have_image    =  false ;
+
+        loaded_image = false   ;
+
+        circle_loop = false   ;
+
+        full_screen  =  false ;
+
+
+        gama_value   =  1.3  ;
+
+     //   AppUtil.getInt("probe_type",0) ;
+
+     //   AppUtil.getFloat("gain_value",0);
+
+     //   AppUtil.getFloat("zoom_value",0) ;
+
+
+        sale_code      =    0   ;
+
+         image_array   =   new ArrayList()  ;
+
+      //  imageData      =   new  MutableByte [0] ;
+
+        imagIndex     =  0  ;
 
         mContentResolver = getContentResolver();
 
@@ -155,6 +258,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     }
+
+
+
 
 
     public void loadData() {
@@ -224,7 +330,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
        public   void unLock(){
         //推荐使用
-        setLockPatternEnabled(android.provider.Settings.Secure.LOCK_PATTERN_ENABLED,false);
+       // setLockPatternEnabled(android.provider.Settings.Secure.,false);
     }
 
     private void setLockPatternEnabled(String systemSettingKey, boolean enabled) {
@@ -247,7 +353,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startScan();
                 try
                 {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 }
                 catch (InterruptedException e)
                 {
@@ -256,6 +362,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }
     }
+
+
 
 
     public void startScan()
@@ -276,6 +384,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 msg.obj =   tempStr;
                 handler.sendMessage(msg);
 
+
                  break;
             }
 
@@ -293,6 +402,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         };
     };
+
+
 
 
 

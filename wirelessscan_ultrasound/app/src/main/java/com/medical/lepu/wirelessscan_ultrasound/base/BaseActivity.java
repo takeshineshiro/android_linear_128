@@ -20,7 +20,7 @@ public class BaseActivity  extends Activity {
 
       public    String     uiName    =   getClass().getSimpleName()   ;
 
-    protected   BaseApp     baseApp   ;
+    // protected AppUtil baseApp   ;
 
     protected   BaseHandler   baseHandler  ;
 
@@ -31,7 +31,7 @@ public class BaseActivity  extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.baseApp    =      (BaseApp) this.getApplicationContext();
+    //    this.baseApp    =      (AppUtil) this.getApplicationContext();
 
 
 

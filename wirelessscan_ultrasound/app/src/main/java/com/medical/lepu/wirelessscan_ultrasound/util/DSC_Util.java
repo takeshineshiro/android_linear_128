@@ -3,9 +3,7 @@ package com.medical.lepu.wirelessscan_ultrasound.util;
 
 import com.medical.lepu.wirelessscan_ultrasound.model.DscIndex;
 
-/**
- * Created by wong on 16/1/14.
- */
+
 public class DSC_Util extends Object{
 
     public   static   final   int    DSC_WIDTH            = 640  ;
@@ -313,7 +311,7 @@ public class DSC_Util extends Object{
                                                      sampleInLine  =  512 ;
 
 
-                                                      break;;
+                                                      break;
 
                                default:
 
@@ -343,7 +341,6 @@ public class DSC_Util extends Object{
                                break;
                            default:
                                return -1;
-                           break;
 
 
                        }
@@ -468,7 +465,7 @@ public class DSC_Util extends Object{
 
                                         DSC_Image[imagePosTemp]     =   DSC_Image[imagePosTemp+1]  = DSC_Image[imagePosTemp+2]  = (byte)gray ;     //need  change !!//
 
-                                        DSC_Image[imagePosTemp+3]   =  255;
+                                        DSC_Image[imagePosTemp+3]   =  127;      //real   255
 
                                     }
                                                    //从右侧开始
@@ -513,7 +510,7 @@ public class DSC_Util extends Object{
 
                                        DSC_Image[imagePosTemp] = DSC_Image[imagePosTemp+1]=DSC_Image[imagePosTemp+2]   =   (byte )gray ;
 
-                                       DSC_Image[imagePosTemp+3]   =  255 ;
+                                       DSC_Image[imagePosTemp+3]   =  127 ;     //real  255
 
 
                                     }
@@ -531,12 +528,12 @@ public class DSC_Util extends Object{
                                     imagePosTemp                =   imagePos    +  (x<<2) ;
 
 
-                                    DSC_Image[imagePosTemp+3]   =   255 ;
+                                    DSC_Image[imagePosTemp+3]   =   127 ;         //real  255
 
 
                                     imagePosTemp                =   imagePos  +  ((DSC_WIDTH-1-x)<<2)   ;
 
-                                     DSC_Image[imagePosTemp+3]  =   255 ;
+                                     DSC_Image[imagePosTemp+3]  =   127 ;       //real  255
 
 
 
@@ -627,4 +624,4 @@ public class DSC_Util extends Object{
 
 
 
-}
+
