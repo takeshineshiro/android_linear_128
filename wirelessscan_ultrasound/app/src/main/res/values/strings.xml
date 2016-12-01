@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">无线超声</string>
+    <string name="running">运行</string>
+    <string name="freezing">冻结</string>
 
 
 </resources>

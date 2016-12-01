@@ -12,25 +12,27 @@ import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.util.MutableByte;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.medical.lepu.wirelessscan_ultrasound.R;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseActivity;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseMessage;
+import com.medical.lepu.wirelessscan_ultrasound.util.AppUtil;
 import com.medical.lepu.wirelessscan_ultrasound.widget.VerticalSeekBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-
-
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,View.OnTouchListener {
 
 
      private  ImageButton       btnWifi;
@@ -93,9 +95,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private     int       probe_type ;  //  探头类型信息
 
-    private     int       gain_value ;  // 探头当前的增益
+    private     float       gain_value ;  // 探头当前的增益
 
-    private    int       zoom_value ;  //  探头当前的缩放
+    private    float      zoom_value ;  //  探头当前的缩放
 
     private    int       sale_code  ;  // 销售区域代码
 
@@ -123,6 +125,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private ContentResolver    mContentResolver ;
 
+    private  GestureDetector   detector  ;
+
+    private   final  static  int                horizontaldistance    = 20;	           //水平最小识别距离
+    private   final   static  int                minVelocity          = 10;		       //最小识别速度
+    private   final   static  int                verticaldistance     = 20 ;           //
 
 
 
@@ -138,6 +145,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         initVariable();
 
+        initItemState();
 
         loadData();
 
@@ -186,6 +194,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
         // add  the  scan  view  content,though  the   ViewGroup  add  the subview
+
+          detector  =  new GestureDetector(MainActivity.this,new ViewGestureListener()) ;
         
     }
 
@@ -208,8 +218,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         btn_freeze.setOnClickListener(this);
 
+        // touch
+        ultrasound_view.setOnTouchListener(this);
+        ultrasound_view.setLongClickable(true);
+
+
 
     }
+
+
+
+
 
 
     public void initVariable() {
@@ -237,12 +256,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         gama_value   =  1.3  ;
 
-     //   AppUtil.getInt("probe_type",0) ;
+        probe_type = AppUtil.getInt("probe_type",0) ;
 
-     //   AppUtil.getFloat("gain_value",0);
+        gain_value = AppUtil.getFloat("gain_value",0);
 
-     //   AppUtil.getFloat("zoom_value",0) ;
-
+         zoom_value= AppUtil.getFloat("zoom_value",0) ;
 
         sale_code      =    0   ;
 
@@ -258,6 +276,108 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     }
+
+
+
+    public   void    initItemState ()  {
+        //  状态的一致性检测
+
+        if (!ssid_valid)  {
+            pitch_connected  =  false;
+        }
+
+        if (!pitch_connected) {
+            running          =  false   ;
+        }
+
+        if (running)    {
+             circle_loop    =  false    ;
+        }
+
+       if (!have_image)  {
+              loaded_image   =  false    ;
+       }
+
+        //  各个按钮的状态调整
+
+        if  (pitch_connected)  {
+            this.btn_freeze.setEnabled(true);
+        }
+         else  {
+            this.btn_freeze.setEnabled(false);
+        }
+
+       if (pitch_connected&&running)  {
+            this.btn_gain_ctl.setEnabled(true);
+       }
+       else  {
+             this.btn_gain_ctl.setEnabled(false);
+       }
+
+        if (running){
+            this.btnWifi.setEnabled(false);
+        }
+       else {
+            this.btnWifi.setEnabled(true);
+        }
+
+         if (running||image_array==null||image_array.isEmpty())    {
+                 scan_seekbar.setEnabled(false);
+         }
+         else  {
+                scan_seekbar.setEnabled(true);
+         }
+
+        if (running||image_array==null||image_array.isEmpty())  {
+                btn_pre.setEnabled(false);
+                btn_play.setEnabled(false);
+                btn_next.setEnabled(false);
+
+        } else {
+            btn_pre.setEnabled(true);
+            btn_play.setEnabled(true);
+            btn_next.setEnabled(true);
+
+        }
+
+          if (!running&&have_image&&!loaded_image)  {
+              btn_save.setEnabled(true);
+          }  else {
+              btn_save.setEnabled(false);
+          }
+
+          if (!running&&!circle_loop)   {
+               btn_scan.setEnabled(true);
+          }  else  {
+              btn_scan.setEnabled(false);
+          }
+
+
+          if (!running&&!circle_loop)  {
+                 btn_settting.setEnabled(true);
+          }  else  {
+                 btn_settting.setEnabled(false);
+          }
+
+        //  更新Frozen标签
+
+        if (running)  {
+          freezing_zone.setText(R.string.running);
+        }  else  {
+             freezing_zone.setText(R.string.freezing);
+        }
+
+        // 更新播放按钮的图标
+
+        if (circle_loop)  {
+             btn_play.setBackgroundResource(R.drawable.btn_pause_pre);
+        }   else  {
+            btn_play.setBackgroundResource(R.drawable.btn_play_pre);
+        }
+
+
+    }
+
 
 
 
@@ -285,18 +405,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
 
-
         Log.i("resume", "main_resume");
-
-
-
-        //     openWifi();
-
-        //      currentWifiInfo = wifiManager.getConnectionInfo();
-
-        //       ssidWifi.setText("当前网络：" + currentWifiInfo.getSSID()+ " ip:"
-        //              + WifiUtil.intToIp(currentWifiInfo.getIpAddress()));
-
 
         super.onResume();
     }
@@ -309,6 +418,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
 
     }
+
+
 
 
     public void onClick(View view) {
@@ -402,6 +513,49 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         };
     };
+
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+
+        return  detector.onTouchEvent(motionEvent) ;
+    }
+
+
+    class   ViewGestureListener    extends GestureDetector.SimpleOnGestureListener  {
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return super.onScroll(e1, e2, distanceX, distanceY);
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+                //大于设定的最小滑动距离并且在水平/竖直方向速度绝对值大于设定的最小速度，则执行相应方法
+                if(e1.getX()-e2.getX() > horizontaldistance && Math.abs(velocityX) > minVelocity){
+                    Toast.makeText(MainActivity.this, "turn left", Toast.LENGTH_SHORT).show();
+
+                }else if(e2.getX() - e1.getX() > horizontaldistance && Math.abs(velocityX) > minVelocity){
+                    Toast.makeText(MainActivity.this, "turn right", Toast.LENGTH_SHORT).show();
+
+                }else if(e1.getY()-e2.getY() > verticaldistance && Math.abs(velocityY) > minVelocity){
+                    Toast.makeText(MainActivity.this, "turn up", Toast.LENGTH_SHORT).show();
+
+                }else if(e2.getY()-e1.getY() > verticaldistance && Math.abs(velocityY) > minVelocity){
+                    Toast.makeText(MainActivity.this, "turn down", Toast.LENGTH_SHORT).show();
+                }
+
+                return super.onFling(e1, e2, velocityX, velocityY);
+
+            }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return super.onDown(e);
+        }
+    }
 
 
 

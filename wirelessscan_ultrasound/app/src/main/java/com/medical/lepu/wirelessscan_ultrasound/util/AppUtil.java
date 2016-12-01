@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
 
@@ -17,9 +16,7 @@ public class AppUtil extends Application {
 
     private    static     String     APP_CINFIG   =  "utrasound_config.pref" ;
 
-    public    static Context   _context  ;
-
-    public    static Resources _resource  ;
+    private static SharedPreferences sp;
 
 
 
@@ -27,32 +24,20 @@ public class AppUtil extends Application {
     public void onCreate() {
         super.onCreate();
 
-        _context   =   getApplicationContext() ;
+        sp=this.getSharedPreferences(APP_CINFIG,Context.MODE_PRIVATE);
 
-        _resource  =   _context.getResources() ;
 
     }
 
 
 
-    public  static    synchronized AppUtil getContext   ()   {
 
-        return    (AppUtil) _context  ;
-
-    }
-
-    public    static    Resources    getResource   ()  {
-
-        return       _resource   ;
-
-    }
 
 
     public    static   SharedPreferences   getPreferences ()  {
 
 
-        return     getContext().getSharedPreferences(
-                APP_CINFIG,   Context.MODE_PRIVATE) ;
+        return      sp ;
 
 
     }
