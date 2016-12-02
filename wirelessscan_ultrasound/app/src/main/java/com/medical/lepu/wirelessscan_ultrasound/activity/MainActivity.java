@@ -11,10 +11,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
-import android.util.MutableByte;
+import android.util.MutableInt;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -25,7 +26,9 @@ import android.widget.Toast;
 import com.medical.lepu.wirelessscan_ultrasound.R;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseActivity;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseMessage;
+import com.medical.lepu.wirelessscan_ultrasound.base.C;
 import com.medical.lepu.wirelessscan_ultrasound.util.AppUtil;
+import com.medical.lepu.wirelessscan_ultrasound.widget.RawImage;
 import com.medical.lepu.wirelessscan_ultrasound.widget.VerticalSeekBar;
 
 import java.util.ArrayList;
@@ -95,9 +98,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
     private     int       probe_type ;  //  探头类型信息
 
-    private     float       gain_value ;  // 探头当前的增益
+    private     int       gain_value ;  // 探头当前的增益
 
-    private    float      zoom_value ;  //  探头当前的缩放
+    private    int          zoom_value ;  //  探头当前的缩放
 
     private    int       sale_code  ;  // 销售区域代码
 
@@ -107,15 +110,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
     private  BaseMessage      message  ;    //  解帧
 
-    private MutableByte[]     imageData ;
+    private MutableInt[]     imageData ;
 
     private    int           imagIndex ;
-
-    private    TextView      labelTime ;
-
-    private    TextView      labelDepth;
-
-    private    TextView      labelGain ;
 
     private WifiManager      wifiManager;
 
@@ -193,7 +190,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
         ultrasound_view =  (ImageView)  findViewById(R.id.ultrasound_image) ;
 
 
-        // add  the  scan  view  content,though  the   ViewGroup  add  the subview
+        // add  the  scan  view  content,through  the   ViewGroup  add  the subview
 
           detector  =  new GestureDetector(MainActivity.this,new ViewGestureListener()) ;
         
@@ -222,7 +219,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
         ultrasound_view.setOnTouchListener(this);
         ultrasound_view.setLongClickable(true);
 
+        //seekbar
+        btn_gain_ctl.setOnSeekBarChangeListener(new VerticalOnSeekBarChangeListener());
 
+        scan_seekbar.setOnSeekBarChangeListener(new HorizontalOnSeekBarChangeListener());
 
     }
 
@@ -258,9 +258,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
         probe_type = AppUtil.getInt("probe_type",0) ;
 
-        gain_value = AppUtil.getFloat("gain_value",0);
+        gain_value = AppUtil.getInt("gain_value",0);
 
-         zoom_value= AppUtil.getFloat("zoom_value",0) ;
+         zoom_value= AppUtil.getInt("zoom_value",0) ;
 
         sale_code      =    0   ;
 
@@ -441,13 +441,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
        public   void unLock(){
         //推荐使用
-       // setLockPatternEnabled(android.provider.Settings.Secure.,false);
-    }
+           getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    private void setLockPatternEnabled(String systemSettingKey, boolean enabled) {
-        //推荐使用
-        android.provider.Settings.Secure.putInt(mContentResolver, systemSettingKey,enabled ? 1 : 0);
-    }
+       }
 
 
 
@@ -537,14 +533,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
                 if(e1.getX()-e2.getX() > horizontaldistance && Math.abs(velocityX) > minVelocity){
                     Toast.makeText(MainActivity.this, "turn left", Toast.LENGTH_SHORT).show();
 
+                     swipeImageView  (C.direction.LEFT)   ;
+
                 }else if(e2.getX() - e1.getX() > horizontaldistance && Math.abs(velocityX) > minVelocity){
                     Toast.makeText(MainActivity.this, "turn right", Toast.LENGTH_SHORT).show();
+
+                    swipeImageView  (C.direction.RIGHT)   ;
 
                 }else if(e1.getY()-e2.getY() > verticaldistance && Math.abs(velocityY) > minVelocity){
                     Toast.makeText(MainActivity.this, "turn up", Toast.LENGTH_SHORT).show();
 
+                    swipeImageView  (C.direction.UP)   ;
+
                 }else if(e2.getY()-e1.getY() > verticaldistance && Math.abs(velocityY) > minVelocity){
                     Toast.makeText(MainActivity.this, "turn down", Toast.LENGTH_SHORT).show();
+
+                    swipeImageView  (C.direction.DOWN)   ;
                 }
 
                 return super.onFling(e1, e2, velocityX, velocityY);
@@ -556,6 +560,135 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
             return super.onDown(e);
         }
     }
+
+
+
+    private   void   swipeImageView (String  direction)  {
+
+           unLock();
+
+        if (running)   {       //  运行中，上下扫手势调节ZOOM
+
+            if (direction.equals(C.direction.DOWN))  {
+                  if (zoom_value>0)
+                      zoom_value-- ;
+
+            } else  if (direction.equals(C.direction.UP))  {
+                      zoom_value++  ;
+            }
+
+            if (zoom_value<0)   {   zoom_value  = 0 ;  }
+            if (zoom_value>3)   {   zoom_value  =3 ;   }
+
+           // 发送命令
+
+
+           // 发送完毕
+          AppUtil.setInt("zoom_value",zoom_value);
+
+        } else if (!loaded_image) {   //  冻结后，左右扫手势回放图像
+            if (!image_array.isEmpty()) {
+                if (direction.equals(C.direction.LEFT)) {
+                    preImageView () ;
+                }else if (direction.equals(C.direction.RIGHT))   {
+                     nextImageView () ;
+                }
+
+            }
+        }
+
+
+    }
+
+       private   void    preImageView ()  {
+
+
+       }
+
+
+       private   void    nextImageView ()   {
+
+
+
+
+       }
+
+
+    class  VerticalOnSeekBarChangeListener  implements   SeekBar.OnSeekBarChangeListener  {
+
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            unLock();
+            gain_value   =  i   ;
+
+            if  (gain_value>127)        gain_value   = 127  ;
+
+            if (gain_value<0)           gain_value   =  0   ;
+
+            // 发送命令
+
+            //结束
+
+            AppUtil.setInt("gain_value",gain_value);
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
+
+
+
+    class  HorizontalOnSeekBarChangeListener  implements SeekBar.OnSeekBarChangeListener  {
+
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+              unLock();
+              if (circle_loop)  {       //停止回放
+
+              //停止回放部分
+
+              }
+                  imagIndex        =  i  ;
+
+                  int    sum       =    image_array.size();
+                  String   num     =    i+"/"+sum  ;
+                  view_num.setText(num);
+
+                  if  (imagIndex  <image_array.size())   {   //绘制图像
+
+                      RawImage    rawImage  =  (RawImage) image_array.get(imagIndex) ;
+
+                      //绘制图像部分
+
+                  }
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+
+
+    }
+
+
 
 
 
