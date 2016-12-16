@@ -160,7 +160,7 @@ public class BaseActivity  extends Activity {
 
     }
 
-    protected   void  onTaskCompleted  (  int  taskId ,  BaseMessage   msg)   {
+    protected   void  onTaskCompleted  (  int  taskId ,   String   msg)   {
 
 
     }
@@ -199,11 +199,30 @@ public class BaseActivity  extends Activity {
           }
 
 
-       protected   void   sendMessage   (int  what  ,  int  taskId  , String  data )   {
+
+           protected   void   sendMessage   (int what ,  int taskId)   {
+
+               Bundle   bundle    =    new Bundle()  ;
+
+               bundle.putInt("task",taskId);
+
+               Message   message    =   new   Message()  ;
+
+               message.what    =  what  ;
+
+               message.setData(bundle);
+
+               baseHandler.sendMessage(message) ;
+
+           }
+
+
+
+    protected   void   sendMessage   (int  what  ,  int  taskId  , String  data )   {
 
            Bundle   bundle    =    new Bundle()  ;
 
-            bundle.putInt("taskId",taskId);
+            bundle.putInt("task",taskId);
 
            bundle.putString("data",data);
 
@@ -245,7 +264,7 @@ public class BaseActivity  extends Activity {
 
         }
 
-      //get  method
+      //   https  get  method
        protected   void    doTaskAsync  (int taskId ,   String  taskGet  )    {
 
            baseTaskPool.addTask(taskId,new BaseTask(){
@@ -269,7 +288,7 @@ public class BaseActivity  extends Activity {
 
 
 
-      //post  method
+      //   https  post  method
 
         protected   void    doTaskAsync   (int  taskId , String  taskPost , HashMap<String,String> taskParam)    {
 
@@ -290,6 +309,40 @@ public class BaseActivity  extends Activity {
 
 
         }
+
+
+
+     // socket  io  method
+
+
+       protected   void     doTaskAsync    (int  taskId , String  host ,  int  port)   {
+
+           baseTaskPool.addTask(taskId, new BaseTask() {
+
+               @Override
+               public void onCompleted(String socketResult) {
+                   super.onCompleted(socketResult);
+
+                   sendMessage(BaseTask.TASK_COMPLETED,this.getId(),socketResult);
+
+               }
+
+               @Override
+               public void onError(String error) {
+                   super.onError(error);
+
+                   sendMessage(BaseTask.NETWORK_ERROR,this.getId(),null);
+
+               }
+           },  host,port,0 );
+
+
+
+
+
+       }
+
+
 
 
 }

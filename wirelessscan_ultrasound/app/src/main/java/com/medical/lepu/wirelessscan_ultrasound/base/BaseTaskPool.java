@@ -26,7 +26,7 @@ public class BaseTaskPool       {
     }
 
 
-    //cutstom
+    //cutstom   method
     public   void   addTask  ( int taskId ,  BaseTask   task ,  int  delayTime)   {
         task.setId(taskId);
 
@@ -42,7 +42,7 @@ public class BaseTaskPool       {
 
     }
 
-// get
+//   https  get   method
 
     public   void    addTask ( int  taskId ,  BaseTask task ,  String  taskGet ,  int  delayTime)   {
 
@@ -60,7 +60,7 @@ public class BaseTaskPool       {
     }
 
 
-//Post
+//  https  Post   method
 
     public   void   addTask  (int  taskId, BaseTask  task , String  taskPost, HashMap<String,String>taskParam,  int delayTime)   {
 
@@ -77,6 +77,72 @@ public class BaseTaskPool       {
 
 
     }
+
+
+
+  // socket  io   method
+
+    public   void   addTask  (int  taskId ,  BaseTask  task , String host ,  int port ,  int  delayTime)   {
+
+        task.setId(taskId);
+
+        try  {
+
+            taskpool.execute(new SocketTaskThread(ctx,taskId,task,host,port,delayTime));
+        }   catch ( Exception  e )     {
+
+            taskpool.shutdown();
+        }
+
+
+    }
+
+
+
+       private   class    SocketTaskThread    implements    Runnable    {
+
+           private    Context   context   ;
+
+           private     int       taskId   ;
+
+           private    BaseTask    task     ;
+
+           private    String      host     ;
+
+           private    int         port     ;
+
+           private    int        delayTime ;
+
+
+         public    SocketTaskThread  (Context  context , int  taskId , BaseTask  task , String  host , int   port  ,   int   delayTime)   {
+
+              this.context    =  context   ;
+              this.taskId     =  taskId    ;
+              this.task       =  task      ;
+              this.host       =  host      ;
+              this.port       =   port      ;
+              this.delayTime  =  delayTime  ;
+
+         }
+
+
+           @Override
+           public void run() {
+
+      
+
+
+
+
+           }
+
+
+
+
+
+
+       }
+
 
 
 
@@ -125,10 +191,17 @@ public class BaseTaskPool       {
         }
 
 
+        
 
 
 
     }
+
+
+
+
+
+
 
 
 

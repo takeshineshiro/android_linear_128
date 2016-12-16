@@ -1,6 +1,5 @@
 package com.medical.lepu.wirelessscan_ultrasound.base;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -11,11 +10,11 @@ import android.os.Message;
 
 public class BaseHandler  extends Handler  {
 
-     protected Context   ctx   ;
+     protected  BaseActivity   ctx   ;
 
 
 
-    public    BaseHandler  ( Context  ctx)   {
+    public    BaseHandler  ( BaseActivity  ctx)   {
 
            this.ctx   =ctx  ;
     }
@@ -30,6 +29,67 @@ public class BaseHandler  extends Handler  {
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
+
+        try {
+                int       taskId  =  0  ;
+                String    result       ;
+
+            switch (msg.what)  {
+
+                case    BaseTask.TASK_COMPLETED : {
+                    taskId = msg.getData().getInt("task");
+                    result = msg.getData().getString("data");
+
+                    if (result != null) {
+                        ctx.onTaskCompleted(taskId, result);
+                    } else if (taskId > 0) {
+                        ctx.onTaskCompleted(taskId);
+                    } else {
+                        ctx.toast(C.err.message);
+                    }
+
+                    break;
+                }
+
+                 case   BaseTask.NETWORK_ERROR:     {
+
+                     taskId = msg.getData().getInt("task");
+
+                     ctx.onTaskError(taskId);
+
+                        break;
+
+                 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+
+
+
+
+
+
+        }catch ( Exception e )  {
+
+          e.printStackTrace();
+
+           ctx.toast(e.getMessage());
+        }
+
+
+
 
 
 

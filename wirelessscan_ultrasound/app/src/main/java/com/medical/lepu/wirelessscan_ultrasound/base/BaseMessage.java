@@ -8,5 +8,4 @@ public class BaseMessage   extends  Object {
 
 
 
-
 }
