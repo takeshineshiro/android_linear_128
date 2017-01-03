@@ -25,6 +25,8 @@ public class HttpClient      implements   ConnectCallback {
 
     private    int      port    ;
 
+    private   AsyncServer server ;
+
     private AsyncSocket   socket  ;
 
     private  boolean     connect_state  = false;
@@ -35,19 +37,32 @@ public class HttpClient      implements   ConnectCallback {
 
     public   HttpClient  ( String  host   , int  port )   {
 
-        this.host   =  host   ;
-        this.port   =  port   ;
+        this.host           =  host   ;
+        this.port           =  port   ;
 
-        setup   ()  ;
+        this.server         =    new AsyncServer()    ;
 
     }
+
+
 
     public    void   setup   ()   {
 
 
-        AsyncServer.getDefault().connectSocket(new InetSocketAddress(host, port), this);
+          server.connectSocket(new InetSocketAddress(host, port), this);
 
     }
+
+
+
+
+    public    AsyncServer     getServer ()   {
+
+           return    server  ;
+
+    }
+
+
 
 
     @Override
@@ -81,6 +96,8 @@ public class HttpClient      implements   ConnectCallback {
 
 
    }
+
+
 
     public    byte[]   readData  () {
 

@@ -35,7 +35,7 @@ public class BaseActivity  extends Activity {
 
 
 
-        this.baseHandler  =    new BaseHandler(this)   ;
+        this.baseHandler    =    new BaseHandler(this)   ;
 
         this.baseTaskPool   =    new BaseTaskPool(this) ;
 

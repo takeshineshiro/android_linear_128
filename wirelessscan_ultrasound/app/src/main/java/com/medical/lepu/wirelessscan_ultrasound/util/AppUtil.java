@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.DisplayMetrics;
 
+import com.squareup.leakcanary.LeakCanary;
+
 
 /**
  * Created by wong on 11/23/16.
@@ -18,18 +20,26 @@ public class AppUtil extends Application {
 
     private static SharedPreferences sp;
 
+    private   static   AppUtil     app ;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        app =   this ;
         sp=this.getSharedPreferences(APP_CINFIG,Context.MODE_PRIVATE);
+
+        LeakCanary.install(this) ;
 
 
     }
 
 
+    public static Context getContext() {
+
+        return app.getApplicationContext();
+    }
 
 
 

@@ -21,6 +21,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koushikdutta.async.AsyncServer;
+import com.koushikdutta.async.AsyncSocket;
+import com.koushikdutta.async.callback.ConnectCallback;
 import com.medical.lepu.wirelessscan_ultrasound.R;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseActivity;
 import com.medical.lepu.wirelessscan_ultrasound.base.BaseMessage;
@@ -32,13 +35,14 @@ import com.medical.lepu.wirelessscan_ultrasound.util.DSC_Util;
 import com.medical.lepu.wirelessscan_ultrasound.widget.RawImage;
 import com.medical.lepu.wirelessscan_ultrasound.widget.VerticalSeekBar;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MainActivity extends BaseActivity implements View.OnClickListener,View.OnTouchListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,View.OnTouchListener{
 
 
     private ImageButton btnWifi;
@@ -140,6 +144,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
     private Timer connectTimer;
 
     private TimerTask connectTimerTask;
+
+    private AsyncServer dataControlSocket;
+
 
 
     private final static int horizontaldistance = 20;               //水平最小识别距离
@@ -422,6 +429,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
     protected void onResume() {
 
         Log.i("resume", "main_resume");
+
+        String   thread_id   =   Thread.currentThread().getName();
+
+        Log.i("main", thread_id);
 
         super.onResume();
     }
@@ -706,7 +717,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
         }
 
-        nullImageTimer.schedule(nullImageTimerTask, 0, 100);       //0.1s
+        nullImageTimer.schedule(nullImageTimerTask, 0, 1000);       //1s
 
 
     }
@@ -742,7 +753,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
             };
         }
 
-        connectTimer.schedule(connectTimerTask, 0, 10);        //0.01s
+        connectTimer.schedule(connectTimerTask, 0, 1000);        //1s
 
     }
 
@@ -765,7 +776,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
             switch (taskId)     {
 
-                case  C.task.wifi  :    {
+                case  C.task.wifi  :
 
                     try {
                         ssid_wifi.setText("");
@@ -786,11 +797,34 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
                     break;
 
-                }
+
+                    case  C.task.dataControl  :
+
+                        pitch_connected  = true  ;
+
+                        initItemState();
+
+
+                    break;
+
+
+                  case  C.task.stateControl  :
+
+                      pitch_connected  = true  ;
+
+                      initItemState();
+
+                    break;
 
 
 
+                case   C.task.receiveControl :
 
+                    pitch_connected  = true  ;
+
+                    initItemState();
+
+                     break;
 
 
             }
@@ -854,6 +888,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
     @Override
     protected void onTaskError(int taskId) {
+
         super.onTaskError(taskId);
     }
 
@@ -863,17 +898,111 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,V
 
             if (ssid_valid && !pitch_connected)  {
 
-                doTaskAsync(C.task.dataControl,C.api.host,C.port.dataControl);
+            //    doTaskAsync(C.task.dataControl,C.api.host,C.port.dataControl);
 
-                doTaskAsync(C.task.stateControl,C.api.host,C.port.stateControl);
+           //     doTaskAsync(C.task.stateControl,C.api.host,C.port.stateControl);
 
-                doTaskAsync(C.task.receiveControl,C.api.host,C.port.receiveControl);
+           //     doTaskAsync(C.task.receiveControl,C.api.host,C.port.receiveControl);
+
+           //       new AsyncServer().connectSocket(new InetSocketAddress(C.api.host, C.port.dataControl),this);
+
+           //       new AsyncServer().connectSocket(new InetSocketAddress(C.api.host, C.port.stateControl),this);
+
+           //       new AsyncServer().connectSocket(new InetSocketAddress(C.api.host, C.port.receiveControl),this);
+
+
+                  if (dataControlSocket==null)  {
+
+                      dataControlSocket  =  new AsyncServer() ;
+                  }
+
+
+
+                {
+                    AsyncServer.getDefault().connectSocket(new InetSocketAddress(C.api.host, C.port.dataControl),dataControlCallback);
+
+                    AsyncServer.getDefault().connectSocket(new InetSocketAddress(C.api.host, C.port.stateControl),stateControlCallback);
+
+                    AsyncServer.getDefault().connectSocket(new InetSocketAddress(C.api.host, C.port.receiveControl),receiveControlCallback) ;
+
+                }
+
+
+
 
             }
 
-
-
       }
+
+
+
+    ConnectCallback      dataControlCallback    =      new ConnectCallback() {
+        @Override
+        public void onConnectCompleted(Exception ex, AsyncSocket socket) {
+
+            Log.d("dataControl","dataControl  on  connected !")  ;
+
+            sendMessage(BaseTask.TASK_COMPLETED,C.task.dataControl);
+
+
+
+
+
+
+
+
+
+
+        }
+    }  ;
+
+
+    ConnectCallback     stateControlCallback  =     new ConnectCallback() {
+        @Override
+        public void onConnectCompleted(Exception ex, AsyncSocket socket) {
+
+            Log.d("stateControl","stateControl  on  connected !")  ;
+
+            sendMessage(BaseTask.TASK_COMPLETED,C.task.stateControl);
+
+
+
+        }
+    }   ;
+
+
+
+    ConnectCallback   receiveControlCallback   =    new ConnectCallback() {
+        @Override
+        public void onConnectCompleted(Exception ex, AsyncSocket socket) {
+
+            Log.d("receiveControl","receiveControl  on  connected !")  ;
+
+            sendMessage(BaseTask.TASK_COMPLETED,C.task.receiveControl);
+
+
+            
+
+
+
+
+        }
+    }   ;
+
+
+
+
+
+
+
+    private   void     sendParamZoom   ( )   {
+
+
+
+
+    }
+
+
 
 
 
