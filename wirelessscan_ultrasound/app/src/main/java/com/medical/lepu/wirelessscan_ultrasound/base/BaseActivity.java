@@ -174,7 +174,7 @@ public class BaseActivity  extends Activity {
 
        protected    void    sendMessage  (  int  what )  {
 
-           Message     message    =    new   Message()    ;
+           Message     message    =      Message.obtain() ;
 
             message.what   =  what   ;
 
@@ -188,7 +188,7 @@ public class BaseActivity  extends Activity {
 
               bundle.putString("data",data);
 
-              Message     message    =   new Message()   ;
+              Message     message    =   Message.obtain()  ;
 
                 message.what   =  what   ;
 
@@ -206,7 +206,7 @@ public class BaseActivity  extends Activity {
 
                bundle.putInt("task",taskId);
 
-               Message   message    =   new   Message()  ;
+               Message   message    =     Message.obtain() ;
 
                message.what    =  what  ;
 
@@ -226,7 +226,7 @@ public class BaseActivity  extends Activity {
 
            bundle.putString("data",data);
 
-           Message   message    =   new   Message()  ;
+           Message   message    =   Message.obtain()  ;
 
                message.what    =  what  ;
 
